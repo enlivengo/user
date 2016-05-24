@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/enlivengo/database"
 	"github.com/enlivengo/enliven"
-	"github.com/enlivengo/enliven/apps/database"
 	"github.com/enlivengo/enliven/config"
 	"github.com/jmcvetta/randutil"
 )

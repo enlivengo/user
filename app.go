@@ -4,8 +4,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/enlivengo/admin"
+	"github.com/enlivengo/database"
 	"github.com/enlivengo/enliven"
-	"github.com/enlivengo/enliven/apps/database"
 	"github.com/enlivengo/enliven/config"
 	"github.com/jinzhu/gorm"
 )
