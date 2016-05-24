@@ -34,7 +34,7 @@ func LoginPostHandler(ctx *enliven.Context) {
 	password := ctx.Request.Form.Get("password")
 
 	conf := config.GetConfig()
-	db := database.GetDatabase(ctx.Enliven)
+	db := database.GetDatabase()
 
 	user := User{}
 	var where string
@@ -66,7 +66,7 @@ func RegisterGetHandler(ctx *enliven.Context) {
 func RegisterPostHandler(ctx *enliven.Context) {
 	ctx.Request.ParseForm()
 	var errors []FormError
-	db := database.GetDatabase(ctx.Enliven)
+	db := database.GetDatabase()
 	conf := config.GetConfig()
 	verifyAccount := (conf["user_require_verification"] == "1" && ctx.Enliven.Core.Email.Enabled())
 
@@ -205,7 +205,7 @@ func ProfileGetHandler(ctx *enliven.Context) {
 func ProfilePostHandler(ctx *enliven.Context) {
 	ctx.Request.ParseForm()
 	var errors []FormError
-	db := database.GetDatabase(ctx.Enliven)
+	db := database.GetDatabase()
 	conf := config.GetConfig()
 	u := GetUser(ctx)
 
@@ -302,7 +302,7 @@ func VerifyHandler(ctx *enliven.Context) {
 		return
 	}
 
-	db := database.GetDatabase(ctx.Enliven)
+	db := database.GetDatabase()
 	u := User{}
 	db.Where("Verification_Code = ? AND Status = ?", code, 0).First(&u)
 

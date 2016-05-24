@@ -24,7 +24,7 @@ func GetUser(ctx *enliven.Context) *User {
 
 	var user User
 	dbUserID, _ := ctx.Integers["UserID"]
-	database.GetDatabase(ctx.Enliven).Preload("Groups").Preload("Groups.Permissions").First(&user, dbUserID)
+	database.GetDatabase().Preload("Groups").Preload("Groups.Permissions").First(&user, dbUserID)
 
 	// Caching the user lookup for later.
 	ctx.Storage["User"] = &user
@@ -143,7 +143,7 @@ func (ua *App) Initialize(ev *enliven.Enliven) {
 
 	conf = config.UpdateConfig(config.MergeConfig(conf, config.GetConfig()))
 
-	db := database.GetDatabase(ev)
+	db := database.GetDatabase()
 
 	// Migrating the user tables
 	db.AutoMigrate(&Permission{}, &Group{}, &User{})
@@ -218,7 +218,7 @@ func (ua *App) HasPermission(permission string, ctx *enliven.Context) bool {
 
 // AddPermission adds a new permission to the user table if it doesn't exist
 func (ua *App) AddPermission(permission string, ev *enliven.Enliven, groups ...string) {
-	db := database.GetDatabase(ev)
+	db := database.GetDatabase()
 
 	perm := Permission{}
 	db.Where(&Permission{Name: permission}).First(&perm)
