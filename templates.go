@@ -88,7 +88,7 @@ func templatesLoginHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/login.html", size: 1334, mode: os.FileMode(436), modTime: time.Unix(1464039900, 0)}
+	info := bindataFileInfo{name: "templates/login.html", size: 1334, mode: os.FileMode(436), modTime: time.Unix(1464070631, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -108,7 +108,7 @@ func templatesPasswordHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/password.html", size: 204, mode: os.FileMode(436), modTime: time.Unix(1464039900, 0)}
+	info := bindataFileInfo{name: "templates/password.html", size: 204, mode: os.FileMode(436), modTime: time.Unix(1464070680, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
