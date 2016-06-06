@@ -52,6 +52,12 @@
     <div class="form-field">
         <input type="submit" value="Submit" />
     </div>
+    
+    {{if .Strings.ForgotPasswordURL}}
+        <div class="form-field">
+            <a href="{{.Strings.ForgotPasswordURL}}">Forgot Password?</a>
+        </div>
+    {{end}}
 
 </form>
 

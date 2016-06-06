@@ -123,19 +123,20 @@ func (ua *App) Initialize(ev *enliven.Enliven) {
 	}
 
 	var conf = config.Config{
-		"user_login_route":    "/user/login/",
-		"user_logout_route":   "/user/logout/",
-		"user_register_route": "/user/register/",
-		"user_verify_route":   "/user/verify/{code}/",
-		"user_password_route": "/user/password/",
-		"user_profile_route":  "/user/profile/",
+		"user_login_route":           "/user/login/",
+		"user_logout_route":          "/user/logout/",
+		"user_register_route":        "/user/register/",
+		"user_verify_route":          "/user/verify/{code}/",
+		"user_forgot_password_route": "/user/forgot-password/",
+		"user_password_reset_route":  "/user/reset-password/{code}",
+		"user_profile_route":         "/user/profile/",
 
 		// Where the user will be redirected after these successful actions
-		"user_login_redirect":    "/",
-		"user_logout_redirect":   "/",
-		"user_register_redirect": "/user/login/",
-		"user_password_redirect": "/",
-		"user_profile_redirect":  "/user/profile/",
+		"user_login_redirect":          "/",
+		"user_logout_redirect":         "/",
+		"user_register_redirect":       "/user/login/",
+		"user_password_reset_redirect": "/user/login/",
+		"user_profile_redirect":        "/user/profile/",
 
 		"user_default_group":        "Member",
 		"user_require_verification": "1",
@@ -158,11 +159,14 @@ func (ua *App) Initialize(ev *enliven.Enliven) {
 	ev.AddRoute(conf["user_profile_route"], ProfilePostHandler, "POST")
 	ev.AddRoute(conf["user_verify_route"], VerifyHandler)
 	ev.AddRoute(conf["user_logout_route"], LogoutHandler)
+	ev.AddRoute(conf["user_forgot_password_route"], ForgotPasswordGetHandler, "GET")
+	ev.AddRoute(conf["user_forgot_password_route"], ForgotPasswordPostHandler, "POST")
+	ev.AddRoute(conf["user_password_reset_route"], PasswordResetHandler)
 
 	// Handles the setup of context variables to support user session management
 	ev.AddMiddlewareFunc(SessionMiddleware)
 
-	for _, templateType := range []string{"login", "password", "register", "verify", "profile", "verify_email"} {
+	for _, templateType := range []string{"login", "forgot_password", "forgot_password_email", "register", "verify", "profile", "verify_email"} {
 		ev.Core.Templates.Parse(getTemplate(templateType))
 	}
 

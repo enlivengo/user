@@ -24,6 +24,9 @@ type FormError struct {
 
 // LoginGetHandler handles get requests to the login route
 func LoginGetHandler(ctx *enliven.Context) {
+	if ctx.Enliven.Core.Email.Enabled() {
+		ctx.Strings["ForgotPasswordURL"] = config.GetConfig()["user_forgot_password_route"]
+	}
 	ctx.Template("user_login")
 }
 
@@ -172,7 +175,7 @@ func RegisterPostHandler(ctx *enliven.Context) {
 			"Config":  conf,
 		}
 		var bMessage bytes.Buffer
-		eerr := ctx.Enliven.Core.Templates.ExecuteTemplate(&bMessage, "verify_email", templateData)
+		eerr := ctx.Enliven.Core.Templates.ExecuteTemplate(&bMessage, "user_verify_email", templateData)
 		if eerr != nil {
 			fmt.Println(eerr.Error())
 		}
@@ -297,7 +300,7 @@ func VerifyHandler(ctx *enliven.Context) {
 	ctx.Booleans["Verified"] = false
 
 	code, ok := ctx.Vars["code"]
-	if !ok {
+	if !ok || code == "" {
 		ctx.Template("user_verify")
 		return
 	}
@@ -312,11 +315,132 @@ func VerifyHandler(ctx *enliven.Context) {
 	}
 
 	u.Status = 1
+	u.VerificationCode = ""
 	db.Save(&u)
 
 	ctx.Booleans["Verified"] = true
 	ctx.Strings["LoginURL"] = config.GetConfig()["user_login_route"]
 	ctx.Template("user_verify")
+}
+
+// ForgotPasswordGetHandler Allows a user to enter their email address to have their password reset
+func ForgotPasswordGetHandler(ctx *enliven.Context) {
+	if !ctx.Enliven.Core.Email.Enabled() {
+		ctx.Forbidden()
+		return
+	}
+
+	ctx.Template("user_forgot_password")
+}
+
+// ForgotPasswordPostHandler accepts a posted email address which we'll
+// send a new verification code to so they can reset their password
+func ForgotPasswordPostHandler(ctx *enliven.Context) {
+	if !ctx.Enliven.Core.Email.Enabled() {
+		ctx.Forbidden()
+		return
+	}
+
+	ctx.Request.ParseForm()
+	var errors []FormError
+	email := strings.TrimSpace(ctx.Request.Form.Get("email"))
+
+	if !govalidator.IsEmail(email) {
+		errors = append(errors, FormError{
+			Message: "The provided email address is invalid.",
+			Field:   "email",
+		})
+	}
+
+	if len(errors) > 0 {
+		jsonResponse, _ := json.Marshal(errors)
+		ctx.Strings["FormErrors"] = string(jsonResponse[:])
+	} else {
+		// Even if we can't find the requested email, we will pretend we found it for security purposes.
+		ctx.Strings["EmailAddress"] = email
+		db := database.GetDatabase()
+		conf := config.GetConfig()
+
+		u := User{}
+		db.Where("Email = ?", email).First(&u)
+		if u.ID != 0 {
+			// Setting a verification code for this user.
+			verificationCode, _ := randutil.AlphaString(32)
+			u.VerificationCode = verificationCode
+			db.Save(&u)
+
+			// Rendering the email that we're going to send to the user.
+			templateData := map[string]interface{}{
+				"User":    u,
+				"Context": ctx,
+				"Config":  conf,
+			}
+			var bMessage bytes.Buffer
+			eerr := ctx.Enliven.Core.Templates.ExecuteTemplate(&bMessage, "user_forgot_password_email", templateData)
+			if eerr != nil {
+				fmt.Println(eerr.Error())
+			}
+
+			// Sending the email.
+			email := ctx.Enliven.Core.Email.New()
+			email.AddRecipient(u.Email)
+			email.Subject = conf["site_name"] + ": Password Reset Request"
+			email.Message = bMessage.String()
+			err := email.Send()
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+		}
+	}
+
+	ctx.Template("user_forgot_password")
+}
+
+// PasswordResetGetHandler checks if a password reset code is legit, and presents the user with a password reset form.
+func PasswordResetGetHandler(ctx *enliven.Context) {
+	code, ok := ctx.Vars["code"]
+	if !ok || code == "" {
+		ctx.Forbidden()
+		return
+	}
+
+	db := database.GetDatabase()
+	u := User{}
+	db.Where("Verification_Code = ?", code).First(&u)
+
+	if u.ID == 0 {
+		ctx.Forbidden()
+		return
+	}
+
+	ctx.Template("user_password_reset")
+}
+
+// PasswordResetPostHandler checks if a password reset code is legit, and and resets the users password to what has been posted.
+func PasswordResetPostHandler(ctx *enliven.Context) {
+	code, ok := ctx.Vars["code"]
+	if !ok || code == "" {
+		ctx.Forbidden()
+		return
+	}
+
+	db := database.GetDatabase()
+	u := User{}
+	db.Where("Verification_Code = ?", code).First(&u)
+
+	if u.ID == 0 {
+		ctx.Forbidden()
+		return
+	}
+
+	ctx.Request.ParseForm()
+	// TODO: Reset the user's password to the posted values here.
+
+	u.Status = 1
+	u.VerificationCode = ""
+	db.Save(&u)
+
+	ctx.Template("user_password_reset")
 }
 
 // LogoutHandler logs a user out and redirects them to the configured page.
