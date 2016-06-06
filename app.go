@@ -161,7 +161,8 @@ func (ua *App) Initialize(ev *enliven.Enliven) {
 	ev.AddRoute(conf["user_logout_route"], LogoutHandler)
 	ev.AddRoute(conf["user_forgot_password_route"], ForgotPasswordGetHandler, "GET")
 	ev.AddRoute(conf["user_forgot_password_route"], ForgotPasswordPostHandler, "POST")
-	ev.AddRoute(conf["user_password_reset_route"], PasswordResetHandler)
+	ev.AddRoute(conf["user_password_reset_route"], PasswordResetGetHandler, "GET")
+	ev.AddRoute(conf["user_password_reset_route"], PasswordResetPostHandler, "POST")
 
 	// Handles the setup of context variables to support user session management
 	ev.AddMiddlewareFunc(SessionMiddleware)
