@@ -1,5 +1,6 @@
 package user
 
+//go generate go get github.com/jteeuwen/go-bindata/...
 //go:generate go-bindata -o templates.go -pkg user templates/...
 
 import (
