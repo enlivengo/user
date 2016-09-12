@@ -65,6 +65,14 @@ type User struct {
 	Superuser        bool    `gorm:"index;"`
 }
 
+// Stringify is a test
+func (u User) Stringify() string {
+	if u.DisplayName != "" {
+		return u.DisplayName
+	}
+	return u.Username
+}
+
 // UserHasPermission checks if a user has a specific permission
 func (u *User) UserHasPermission(name string) bool {
 	if u.Superuser {
