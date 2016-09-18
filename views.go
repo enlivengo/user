@@ -28,7 +28,7 @@ func LoginGetHandler(ctx *enliven.Context) {
 	if ctx.Enliven.Core.Email.Enabled() {
 		ctx.Strings["ForgotPasswordURL"] = config.GetConfig()["user_forgot_password_route"]
 	}
-	ctx.Template("user_login")
+	ctx.ExecuteBaseTemplate("user_login")
 }
 
 // LoginPostHandler handles the form submission for logging a user in.
@@ -63,7 +63,7 @@ func LoginPostHandler(ctx *enliven.Context) {
 // RegisterGetHandler handles get requests to the register route
 func RegisterGetHandler(ctx *enliven.Context) {
 	ctx.Strings["FormErrors"] = "[]"
-	ctx.Template("user_register")
+	ctx.ExecuteBaseTemplate("user_register")
 }
 
 // RegisterPostHandler handles get requests to the register route
@@ -140,7 +140,7 @@ func RegisterPostHandler(ctx *enliven.Context) {
 		ctx.Strings["FormErrors"] = string(jsonResponse[:])
 		ctx.Strings["RegisterUsername"] = username
 		ctx.Strings["RegisterEmail"] = email
-		ctx.Template("user_register")
+		ctx.ExecuteBaseTemplate("user_register")
 		return
 	}
 
@@ -202,7 +202,7 @@ func ProfileGetHandler(ctx *enliven.Context) {
 		return
 	}
 	ctx.Strings["FormErrors"] = "[]"
-	ctx.Template("user_profile")
+	ctx.ExecuteBaseTemplate("user_profile")
 }
 
 // ProfilePostHandler handles the updating of a user's profile
@@ -288,7 +288,7 @@ func ProfilePostHandler(ctx *enliven.Context) {
 		jsonResponse, _ := json.Marshal(errors)
 		ctx.Strings["FormErrors"] = string(jsonResponse[:])
 		ctx.Storage["User"] = u
-		ctx.Template("user_profile")
+		ctx.ExecuteBaseTemplate("user_profile")
 		return
 	}
 
@@ -302,7 +302,7 @@ func VerifyHandler(ctx *enliven.Context) {
 
 	code, ok := ctx.Vars["code"]
 	if !ok || code == "" {
-		ctx.Template("user_verify")
+		ctx.ExecuteBaseTemplate("user_verify")
 		return
 	}
 
@@ -311,7 +311,7 @@ func VerifyHandler(ctx *enliven.Context) {
 	db.Where("Verification_Code = ? AND Status = ?", code, 0).First(&u)
 
 	if u.ID == 0 {
-		ctx.Template("user_verify")
+		ctx.ExecuteBaseTemplate("user_verify")
 		return
 	}
 
@@ -321,7 +321,7 @@ func VerifyHandler(ctx *enliven.Context) {
 
 	ctx.Booleans["Verified"] = true
 	ctx.Strings["LoginURL"] = config.GetConfig()["user_login_route"]
-	ctx.Template("user_verify")
+	ctx.ExecuteBaseTemplate("user_verify")
 }
 
 // ForgotPasswordGetHandler Allows a user to enter their email address to have their password reset
@@ -331,7 +331,7 @@ func ForgotPasswordGetHandler(ctx *enliven.Context) {
 		return
 	}
 
-	ctx.Template("user_forgot_password")
+	ctx.ExecuteBaseTemplate("user_forgot_password")
 }
 
 // ForgotPasswordPostHandler accepts a posted email address which we'll
@@ -394,7 +394,7 @@ func ForgotPasswordPostHandler(ctx *enliven.Context) {
 		}
 	}
 
-	ctx.Template("user_forgot_password")
+	ctx.ExecuteBaseTemplate("user_forgot_password")
 }
 
 // PasswordResetGetHandler checks if a password reset code is legit, and presents the user with a password reset form.
@@ -414,7 +414,7 @@ func PasswordResetGetHandler(ctx *enliven.Context) {
 		return
 	}
 
-	ctx.Template("user_password_reset")
+	ctx.ExecuteBaseTemplate("user_password_reset")
 }
 
 // PasswordResetPostHandler checks if a password reset code is legit, and and resets the users password to what has been posted.
@@ -441,7 +441,7 @@ func PasswordResetPostHandler(ctx *enliven.Context) {
 	u.VerificationCode = ""
 	db.Save(&u)
 
-	ctx.Template("user_password_reset")
+	ctx.ExecuteBaseTemplate("user_password_reset")
 }
 
 // LogoutHandler logs a user out and redirects them to the configured page.
