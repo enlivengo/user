@@ -65,7 +65,7 @@ type User struct {
 	Superuser        bool    `gorm:"index;"`
 }
 
-// Stringify is a test
+// Stringify returns the name of the user
 func (u User) Stringify() string {
 	if u.DisplayName != "" {
 		return u.DisplayName
