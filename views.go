@@ -176,7 +176,7 @@ func RegisterPostHandler(ctx *enliven.Context) {
 			"Config":  conf,
 		}
 		var bMessage bytes.Buffer
-		eerr := ctx.Enliven.Core.Templates.ExecuteTemplate(&bMessage, "user_verify_email", templateData)
+		eerr := ctx.Enliven.Core.TemplateManager.BaseTemplate.ExecuteTemplate(&bMessage, "user_verify_email", templateData)
 		if eerr != nil {
 			fmt.Println(eerr.Error())
 		}
@@ -377,7 +377,7 @@ func ForgotPasswordPostHandler(ctx *enliven.Context) {
 				"Config":  conf,
 			}
 			var bMessage bytes.Buffer
-			eerr := ctx.Enliven.Core.Templates.ExecuteTemplate(&bMessage, "user_forgot_password_email", templateData)
+			eerr := ctx.Enliven.Core.TemplateManager.BaseTemplate.ExecuteTemplate(&bMessage, "user_forgot_password_email", templateData)
 			if eerr != nil {
 				fmt.Println(eerr.Error())
 			}

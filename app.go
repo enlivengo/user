@@ -176,7 +176,7 @@ func (ua *App) Initialize(ev *enliven.Enliven) {
 	ev.AddMiddlewareFunc(SessionMiddleware)
 
 	for _, templateType := range []string{"login", "forgot_password", "forgot_password_email", "register", "verify", "profile", "verify_email"} {
-		ev.Core.BaseTemplate.Parse(getTemplate(templateType))
+		ev.Core.TemplateManager.BaseTemplate.Parse(getTemplate(templateType))
 	}
 
 	admin.AddResources(&User{}, &Group{}, &Permission{})
