@@ -209,7 +209,7 @@ func templatesVerify_emailHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/verify_email.html", size: 333, mode: os.FileMode(438), modTime: time.Unix(1473318888, 0)}
+	info := bindataFileInfo{name: "templates/verify_email.html", size: 333, mode: os.FileMode(438), modTime: time.Unix(1481648897, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
